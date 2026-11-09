@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    name: lint / typecheck / test / build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sixty-point-dist
+          path: app/dist
+          retention-days: 7
+
+  copy-guard:
+    name: 文案与原则红线
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 扫描源码中的违规文案
+        run: |
+          set -e
+          FAIL=0
+          scan() {
+            local pattern="$1"
+            local reason="$2"
+            if grep -rn --include='*.ts' --include='*.tsx' --include='*.css' \
+                 -E "$pattern" src 2>/dev/null | grep -v 'copy/strings.ts' > /tmp/hit.txt; then
+              if [ -s /tmp/hit.txt ]; then
+                echo "::error::$reason"
+                cat /tmp/hit.txt
+                FAIL=1
+              fi
+            fi
+          }
+
+          scan '逾期|已拖延|连续[0-9 ]*天|你还没|加油|坚持一下|你可以的' \
+               '出现催促性或打气性文案，违反产品原则「绝不施压」'
+
+          scan '完成度|质量评分|评级|排行榜|得分' \
+               '出现质量评分类概念，违反产品原则「可数资源，不可数质量」'
+
+          if [ "$FAIL" = "1" ]; then exit 1; fi
+          echo "文案红线检查通过。"
+
+      - name: 检查音频依赖（首次引导禁止配乐）
+        run: |
+          set -e
+          if grep -rn --include='*.ts' --include='*.tsx' \
+               -E 'new Audio\(|AudioContext|\.mp3|\.wav|\.ogg' src 2>/dev/null; then
+            echo "::error::检测到音频相关代码或资源，首次引导明确不做配乐"
+            exit 1
+          fi
+          echo "无音频依赖。"
+
+      - name: 提示硬编码中文文案
+        run: |
+          set -e
+          if [ -d src ]; then
+            HARDCODED=$(grep -rn --include='*.tsx' -E '>[^<>{]*[一-龥][^<>{]*<' src 2>/dev/null \
+              | grep -v 'copy/strings.ts' || true)
+            if [ -n "$HARDCODED" ]; then
+              echo "::warning::检测到疑似硬编码中文文案，应改为从 copy/strings.ts 引用："
+              echo "$HARDCODED"
+            fi
+          fi
+
+      - name: 检查禁止的依赖
+        run: |
+          set -e
+          BANNED="tailwind|antd|@mui|@chakra|framer-motion|react-router-dom|moment|redux|@reduxjs"
+          if grep -E "\"($BANNED)" package.json 2>/dev/null; then
+            echo "::error::检测到技术栈锁定文档「不用清单」里的依赖"
+            exit 1
+          fi
+          echo "无违规依赖。"

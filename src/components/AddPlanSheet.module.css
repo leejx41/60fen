@@ -1,0 +1,145 @@
+.field {
+  margin-bottom: 18px;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.label {
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.meta {
+  color: var(--ink-4);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.required {
+  color: var(--amber-ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  color: var(--ink);
+  font-size: 15px;
+  background: var(--surface-low);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.input::placeholder {
+  color: var(--ink-4);
+}
+
+.input:focus {
+  background: #fff;
+  border-color: var(--amber-dim);
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 14px;
+  color: var(--ink-3);
+  background: var(--surface-low);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+
+.timeRow:focus-within {
+  background: #fff;
+  border-color: var(--amber-dim);
+}
+
+.time {
+  flex: 1;
+  height: 48px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+}
+
+.time::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+}
+
+.hint {
+  margin-top: 7px;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  line-height: 18px;
+}
+
+.helper {
+  margin-top: 9px;
+  padding: 9px 11px;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  line-height: 18px;
+  background: rgba(246, 200, 95, 0.1);
+  border-radius: 10px;
+}
+
+.cancel {
+  flex: none;
+  height: 52px;
+  padding: 0 16px;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.submit {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 52px;
+  color: #3d2c00;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--amber-bright) 0%, var(--amber-soft) 100%);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 20px -6px rgba(246, 200, 95, 0.55);
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.submit:hover:not(:disabled) {
+  filter: brightness(1.03);
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submit:disabled {
+  opacity: 0.42;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.submit:focus-visible,
+.cancel:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}

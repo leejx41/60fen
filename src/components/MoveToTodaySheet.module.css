@@ -1,0 +1,72 @@
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 54px;
+  padding: 0 14px;
+  color: var(--ink-3);
+  background: var(--surface-low);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+
+.timeRow:focus-within {
+  background: #fff;
+  border-color: var(--amber-dim);
+}
+
+.time {
+  flex: 1;
+  height: 52px;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+}
+
+.hint {
+  margin-top: 8px;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  line-height: 18px;
+}
+
+.cancel {
+  flex: none;
+  height: 52px;
+  padding: 0 16px;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.submit {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 52px;
+  color: #3d2c00;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--amber-bright) 0%, var(--amber-soft) 100%);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 20px -6px rgba(246, 200, 95, 0.55);
+}
+
+.submit:disabled {
+  opacity: 0.42;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.cancel:focus-visible,
+.submit:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+review/
+.tools/
+.shots/
+.tmp/
+.npm-cache/
+_stitch_ref/
+_stitch_onboarding_ref/

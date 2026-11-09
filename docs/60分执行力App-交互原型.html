@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>60分 · 交互原型</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; padding: 32px 16px 56px;
+    background: #f1f0ec;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: #1f1f1c;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .label { font-size: 12px; color: #8a8a82; margin-bottom: 14px; letter-spacing: .04em; }
+  .device {
+    width: 100%; max-width: 360px;
+    background: #fbfbf9;
+    border: 1px solid #e2e1db;
+    border-radius: 24px;
+    padding: 22px 20px 20px;
+    min-height: 600px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .topbar { font-size: 12px; color: #9c9b93; margin-bottom: 26px; display: flex; justify-content: space-between; }
+  .topbar span.reset { cursor: pointer; color: #6f6e67; border-bottom: 1px solid #d6d5ce; }
+  h1 { font-size: 17px; font-weight: 500; line-height: 1.55; margin: 0 0 18px; letter-spacing: -.01em; }
+  .sub { font-size: 12.5px; color: #8a8a82; line-height: 1.7; margin: 0 0 14px; }
+  .pool-label { font-size: 11px; color: #a4a39b; letter-spacing: .06em; margin: 0 0 8px; }
+  .item {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 13px 14px; background: #fff;
+    border: 1px solid #e6e5df; border-radius: 10px; margin-bottom: 8px;
+  }
+  .item .t { font-size: 11.5px; color: #8a8a82; min-width: 44px; }
+  .item .n { font-size: 14px; }
+  .item .d { font-size: 11.5px; color: #a4a39b; margin-left: auto; }
+  input[type=text] {
+    width: 100%; padding: 12px 14px; font-size: 13.5px;
+    font-family: inherit; color: #1f1f1c;
+    background: #fff; border: 1px solid #e0dfd8; border-radius: 10px;
+    outline: none;
+  }
+  input[type=text]:focus { border-color: #b6b5ab; }
+  .entries { margin: 18px 0 0; display: flex; flex-direction: column; gap: 1px; }
+  .entry {
+    padding: 12px 2px; font-size: 14px; cursor: pointer;
+    color: #3d3c37; border-bottom: 1px solid #f0efe9;
+  }
+  .entry:hover { color: #0f6e56; }
+  .entry::before { content: "→ "; color: #b9b8b0; }
+  .spacer { flex: 1; min-height: 26px; }
+  button.primary {
+    width: 100%; padding: 15px; font-size: 15px; font-weight: 500;
+    font-family: inherit; color: #fff; background: #14624c;
+    border: none; border-radius: 10px; cursor: pointer;
+    letter-spacing: .02em;
+  }
+  button.primary:hover { background: #0f6e56; }
+  button.ghost {
+    width: 100%; padding: 13px; font-size: 13.5px; font-family: inherit;
+    color: #5f5e58; background: transparent; border: 1px solid #e0dfd8;
+    border-radius: 10px; cursor: pointer;
+  }
+  .link { font-size: 13px; color: #8a8a82; text-align: center; cursor: pointer; margin-top: 16px; }
+  .link:hover { color: #4a4a44; }
+  .block {
+    background: #fff; border: 1px solid #e6e5df; border-radius: 12px;
+    padding: 18px 16px; margin: 0 0 14px;
+  }
+  .block p { font-size: 14px; line-height: 1.85; margin: 0; }
+  .block p + p { margin-top: 6px; }
+  .quote { font-size: 12.5px; color: #8a8a82; padding: 0 2px 14px; line-height: 1.7; }
+  .proof {
+    background: #f6f4ec; border: 1px solid #e8e4d5; border-radius: 12px;
+    padding: 15px 16px; margin: 0 0 14px;
+  }
+  .proof .tag { font-size: 11px; color: #99875a; margin: 0 0 7px; letter-spacing: .04em; }
+  .proof p { font-size: 13.5px; line-height: 1.8; margin: 0; }
+  .small-note { font-size: 11.5px; color: #a4a39b; margin-top: 18px; line-height: 1.7; }
+  .center { text-align: center; padding-top: 40px; }
+  .center h2 { font-size: 20px; font-weight: 500; margin: 0 0 12px; }
+  .center p { font-size: 13.5px; color: #6f6e67; margin: 0 0 30px; }
+  .center .struck { font-size: 14.5px; color: #b8b7af; text-decoration: line-through; text-decoration-thickness: 1px; margin: 4px 0 20px; }
+  .center .count { font-size: 12px; color: #8a8a82; line-height: 1.9; margin: 0; }
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+  .hint { font-size: 11px; color: #b0afa7; margin-top: 10px; text-align: center; }
+  .opts { display: flex; gap: 8px; margin-top: 6px; }
+  .opt { flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0dfd8; border-radius: 10px; cursor: pointer; font-size: 15px; background: #fff; }
+  .opt.on { background: #14624c; border-color: #14624c; color: #fff; }
+  .edit { color: #6f6e67; border-bottom: 1px solid #d6d5ce; cursor: pointer; margin-left: 8px; }
+  .edit:hover { color: #14624c; }
+  .overload { background: #faf7ec; border: 1px solid #eae2cc; border-radius: 8px; padding: 9px 12px; font-size: 11.5px; color: #8a7d5c; margin-bottom: 10px; line-height: 1.6; }
+  .mini { margin-top: 8px; padding: 8px 14px; font-size: 12.5px; font-family: inherit; color: #0f6e56; background: #e8f5ef; border: 1px solid #b9dfd1; border-radius: 8px; cursor: pointer; }
+  .mark { color: #0f6e56; cursor: pointer; border-bottom: 1px solid #cfe6dc; }
+  .mark:hover { color: #14624c; border-bottom-color: #0f6e56; }
+  .markdone { color: #0f6e56; font-weight: 500; letter-spacing: .02em; }
+  .fade { animation: fi .28s ease both; }
+  @keyframes fi { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div class="label">60 分 · 交互原型 · 2026-11-08</div>
+<div class="device" id="app"></div>
+
+<script>
+const state = {
+  view: 'home',
+  reason: '',
+  entry: '',
+  refCapacity: 3,
+  overloadClosed: false,
+  draftName: '',
+  draftTime: '20:00',
+  fromWish: -1,
+  todayPlans: [
+    { time: '07:00', name: '健身', marked: false },
+    { time: '20:00', name: '写方案', marked: false },
+    { time: '21:30', name: '复习网络', marked: true },
+    { time: '22:15', name: '回邮件', marked: false }
+  ],
+  wishPlans: [{ name: '整理作品集' }],
+  downgrade: '穿鞋，下楼走一圈'
+};
+
+function render() {
+  const app = document.getElementById('app');
+  const top = `<div class="topbar"><span>今天</span><span class="reset" onclick="reset()">重来</span></div>`;
+  let body = '';
+
+  if (state.view === 'home') {
+    const todayRows = state.todayPlans.map(p => `
+      <div class="item"><span class="t">${p.time}</span><span class="n">${p.name}</span>${
+        p.marked ? '<span class="d markdone">100</span>'
+                 : '<span class="d mark" onclick="go(\'fullscore\')">满分</span>'
+      }</div>`).join('');
+    const wishRows = state.wishPlans.length
+      ? state.wishPlans.map((p, i) => `
+      <div class="item" style="border-style:dashed;background:transparent"><span class="t">—</span><span class="n">${p.name}</span><span class="d mark" onclick="moveToToday(${i})">今天做</span></div>`).join('')
+      : `<p class="hint" style="text-align:left;margin-top:6px">空的。想到什么可以先扔进来，不用挑时候。</p>`;
+    body = `
+      <h1>今天，${state.todayPlans.length} 件事。</h1>
+      <p class="pool-label">今日池<span class="edit" onclick="go('capacity')">参考 ${state.refCapacity} 件</span><span class="edit" onclick="go('add')">+ 添加</span></p>
+      ${state.overloadClosed ? '' : `<div class="overload">今天第 ${state.todayPlans.length} 件。你最近一周实际做完的是 3.2 件。<span style="cursor:pointer;color:#b0a583;margin-left:10px" onclick="state.overloadClosed=true;render()">知道了</span></div>`}
+      ${todayRows}
+      <p class="pool-label" style="margin-top:22px">想做池 · 无上限<span class="edit" onclick="go('addwish')">+ 添加</span></p>
+      ${wishRows}
+      <div class="spacer"></div>
+      <button class="primary" onclick="go('intercept')">模拟 07:00 到点</button>
+      <p class="hint">原型里用按钮代替定时推送</p>`;
+  }
+
+  if (state.view === 'add') {
+    body = `
+      <h1>添加一件事</h1>
+      <p class="pool-label" style="margin-top:14px">这件事是什么</p>
+      <input type="text" id="dn" placeholder="一句话，20 字以内"
+             value="${state.draftName.replace(/"/g, '&quot;')}"
+             oninput="state.draftName=this.value">
+      <p class="pool-label" style="margin-top:20px">什么时候做</p>
+      <input type="time" value="${state.draftTime}"
+             oninput="state.draftTime=this.value"
+             style="width:100%;padding:12px 14px;font-size:13.5px;border:1px solid #e0dfd8;border-radius:10px;background:#fff;font-family:inherit;color:#1f1f1c">
+      <p class="hint" style="text-align:left;margin-top:10px">时间必填。到点才会有人来问你那一句。</p>
+      <p class="pool-label" style="margin-top:22px">最没阻力的一步（可以不填）</p>
+      <input type="text" placeholder="不想动的时候，做完哪一步就算数" value="">
+      <div class="spacer"></div>
+      <button class="primary" onclick="addToday()">加入今日</button>
+      <div class="link" onclick="go('home')">算了</div>`;
+  }
+
+  if (state.view === 'addwish') {
+    body = `
+      <h1>放进想做池</h1>
+      <p class="sub">不问时间。想到什么先放着，等它变成"今天要做"的时候再说。</p>
+      <input type="text" id="wn" placeholder="一件事，一句话"
+             value="${state.draftName.replace(/"/g, '&quot;')}"
+             oninput="state.draftName=this.value">
+      <div class="spacer"></div>
+      <button class="primary" onclick="addWish()">放进去</button>
+      <div class="link" onclick="go('home')">算了</div>`;
+  }
+
+  if (state.view === 'capacity') {
+    const ref = state.refCapacity;
+    const opts = [1, 2, 3, 4, 5, 6].map(n =>
+      `<span class="opt ${ref === n ? 'on' : ''}" onclick="state.refCapacity=${n};state.overloadClosed=false;render()">${n}</span>`
+    ).join('');
+    body = `
+      <h1>你一天大概能认真做完几件？</h1>
+      <p class="sub">这不是上限。它只用来在超量的时候，把你自己的数字摆出来给你看一眼。</p>
+      <div class="opts">${opts}</div>
+      <p class="sub" style="margin-top:22px">当前参考值 ${ref} 件。改完立即生效，不会阻止你加任何一件事。</p>
+      <div class="spacer"></div>
+      <button class="ghost" onclick="go('home')">返回</button>`;
+  }
+
+  if (state.view === 'intercept') {
+    body = `
+      <h1>今天你大概会用什么理由不去？</h1>
+      <p class="sub">07:00 · 健身</p>
+      <p class="pool-label" style="margin-top:16px">用你自己的话说</p>
+      <input type="text" id="reason" placeholder="一句话就行"
+             value="${state.reason.replace(/"/g, '&quot;')}"
+             oninput="state.reason=this.value;document.getElementById('goBtn').style.visibility=this.value.trim()?'visible':'hidden'">
+      <button id="goBtn" class="mini" style="visibility:${state.reason.trim() ? 'visible' : 'hidden'}" onclick="state.entry='free';go('a')">就这段话，继续</button>
+      <p class="pool-label" style="margin-top:22px">或者，挑一句最像的</p>
+      <div class="entries" style="margin-top:4px">
+        <div class="entry" onclick="state.entry='tag';go('a')">我怕今天做不好</div>
+        <div class="entry" onclick="go('b')">我今天有更要紧的事</div>
+        <div class="entry" onclick="go('c')">我身体确实不舒服</div>
+        <div class="entry" onclick="go('d')">我说不清，就是不想动</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="primary" onclick="go('acted')">我去了</button>`;
+  }
+
+  if (state.view === 'a') {
+    const r = state.reason.trim();
+    const showProof = state.entry === 'tag';
+    body = `
+      ${r ? `<p class="quote">你今天说的是：${r}</p>` : ''}
+      ${showProof ? `<div class="proof">
+        <p class="tag">你的记录</p>
+        <p>「我怕今天做不好」这个理由，你今年用过 9 次。<br>其中 7 次，你后来觉得其实该去。另外 2 次，你觉得幸好没去。</p>
+      </div>` : ''}
+      <div class="block">
+        <p>你在比较「健身 60 分的效果」和「健身 100 分的效果」。</p>
+        <p>但今天真实的选择是「健身 60 分的效果」和「0」。</p>
+      </div>
+      <p class="sub" style="margin-bottom:16px">它管不到的事：${state.downgrade}</p>
+      <div class="spacer"></div>
+      <button class="primary" onclick="go('acted')">就做这个</button>
+      <div class="link" onclick="go('night')">今天不做了</div>`;
+  }
+
+  if (state.view === 'b') {
+    body = `
+      <div class="center" style="padding-top:70px">
+        <h2 style="font-size:16px;line-height:1.9">好，记下了。<br>这件事我先放回想做池，<br>它不会跑，你也不用惦记。</h2>
+      </div>
+      <div class="spacer"></div>
+      <button class="ghost" onclick="reset()">知道了</button>
+      <p class="hint">不设截止 · 不记次数 · 今晚不会再问你</p>`;
+  }
+
+  if (state.view === 'c') {
+    body = `
+      <div class="center" style="padding-top:70px">
+        <h2>今天就别去了。</h2>
+        <p>这不是借口。</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="ghost" onclick="reset()">好好休息</button>
+      <p class="hint">今日不再提醒 · 不会复盘 · 不计入任何统计</p>`;
+  }
+
+  if (state.view === 'd') {
+    body = `
+      <div class="block" style="margin-top:24px">
+        <p>好，那不找了。有时候就是不想动，这不用解释。</p>
+      </div>
+      <p class="sub" style="margin-top:20px;margin-bottom:16px">它管不到的事：${state.downgrade}</p>
+      <div class="spacer"></div>
+      <button class="primary" onclick="go('acted')">就做这个</button>
+      <div class="link" onclick="go('night')">今天不做了</div>`;
+  }
+
+  if (state.view === 'acted') {
+    const r = state.reason.trim();
+    body = `
+      <div class="center" style="padding-top:46px">
+        <h2>你去了。</h2>
+        ${r ? `<p class="struck">${r}</p>` : ''}
+        ${r ? `<p class="count">今年第 12 次。<br>把「不去」改成「去了」。</p>` : ''}
+      </div>
+      <div class="spacer"></div>
+      <button class="ghost" onclick="reset()">好</button>`;
+  }
+
+  if (state.view === 'fullscore') {
+    body = `
+      <div class="center" style="padding-top:76px">
+        <h2 style="font-size:22px">100 分。</h2>
+        <p style="margin-bottom:0;font-size:14px;color:#4a4a44">这次你做得很好。</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="ghost" onclick="go('home')">好的</button>`;
+  }
+
+  if (state.view === 'night') {
+    body = `
+      <h1>早上那个决定，现在你怎么看？</h1>
+      <p class="sub">不用想太久。</p>
+      <div class="entries" style="margin-top:26px">
+        <div class="entry" onclick="finish('幸好没去')">幸好没去</div>
+        <div class="entry" onclick="finish('其实该去的')">其实该去的</div>
+        <div class="entry" onclick="finish('说不好')">说不好</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="link" onclick="reset()">这次不说了</div>`;
+  }
+
+  if (state.view === 'done') {
+    body = `
+      <div class="center" style="padding-top:60px">
+        <h2 style="font-size:17px">记下了。</h2>
+        <p style="line-height:1.9">你今天在最想放弃的那一刻，<br>停下来看了一眼自己在比什么。</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="ghost" onclick="reset()">从头再走一遍</button>`;
+  }
+
+  app.innerHTML = top + `<div class="fade">${body}</div>`;
+  if (state.view === 'home') app.innerHTML = top + body;
+}
+
+function go(v) { state.view = v; render(); }
+function finish(ans) { state.lastAnswer = ans; go('done'); }
+
+function addToday() {
+  const n = (state.draftName || '').trim();
+  if (!n) return;
+  state.todayPlans.push({ time: state.draftTime || '20:00', name: n.slice(0, 20), marked: false });
+  state.todayPlans.sort((a, b) => a.time.localeCompare(b.time));
+  if (state.fromWish >= 0) { state.wishPlans.splice(state.fromWish, 1); state.fromWish = -1; }
+  state.draftName = ''; state.overloadClosed = false;
+  go('home');
+}
+
+function addWish() {
+  const n = (state.draftName || '').trim();
+  if (!n) return;
+  state.wishPlans.push({ name: n.slice(0, 20) });
+  state.draftName = '';
+  go('home');
+}
+
+function moveToToday(i) {
+  state.draftName = state.wishPlans[i].name;
+  state.draftTime = '20:00';
+  state.fromWish = i;
+  go('add');
+}
+
+function reset() {
+  state.view = 'home'; state.reason = ''; state.entry = '';
+  state.refCapacity = 3; state.overloadClosed = false;
+  state.draftName = ''; state.draftTime = '20:00'; state.fromWish = -1;
+  state.todayPlans = [
+    { time: '07:00', name: '健身', marked: false },
+    { time: '20:00', name: '写方案', marked: false },
+    { time: '21:30', name: '复习网络', marked: true },
+    { time: '22:15', name: '回邮件', marked: false }
+  ];
+  state.wishPlans = [{ name: '整理作品集' }];
+  render();
+}
+render();
+</script>
+</body>
+</html>
